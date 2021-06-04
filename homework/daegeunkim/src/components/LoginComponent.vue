@@ -17,9 +17,12 @@
           Password
         </label>
         <input v-model="pwd"
-          class="shadow appearance-none border border-red rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline"
+          v-bind:class="{'border-red': isPwdOutOfFormat}"
+          class="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3 leading-tight focus:outline-none focus:shadow-outline"
           id="password" type="password" placeholder="******************">
-        <p class="text-red text-xs italic">Please choose a password.</p>
+        <div v-if="isPwdOutOfFormat">
+          <p class="text-red text-xs italic">Please choose a password.</p>
+        </div>
       </div>
       <!-- button area -->
       <div class="flex items-center justify-between">
@@ -41,13 +44,23 @@ export default {
   data: function() {
     return {
       name: '',
-      pwd: ''
+      pwd: '',
+      isPwdOutOfFormat: true
+    }
+  },
+  watch: {
+    pwd: function(val) {
+      if(val.length > 0){
+        this.isPwdOutOfFormat = false;
+      }
+      else{
+        this.isPwdOutOfFormat = true;
+      }
     }
   },
   methods: {
     signIn: function() {
-      fetch({
-        url: 'https://jsonplaceholder.typicode.com/users/',
+      fetch('https://jsonplaceholder.typicode.com/users/', {
         method: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=UTF-8',
@@ -57,11 +70,11 @@ export default {
         })
       })
       .then((res) => {
-        console.log(res);
+        console.log(res.body);
         this.name = '';
         this.pwd = '';
       })
-      .then((err) => {
+      .catch((err) => {
         console.log(err);
       });
     }
